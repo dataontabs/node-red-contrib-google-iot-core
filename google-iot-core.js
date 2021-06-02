@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Modifications Copyright 2017 Sense Tecnic Systems, Inc.
  **/
 
@@ -23,7 +23,7 @@ module.exports = function (RED) {
     var isUtf8 = require('is-utf8');
     var jwt = require('jsonwebtoken');
     var path = require("path");
-    var fs = require("fs-extra");    
+    var fs = require("fs-extra");
     var MQTTStore = require('mqtt-nedb-store');
     
     var mqttDir = path.join(RED.settings.userDir, 'google-iot-core');
@@ -138,7 +138,7 @@ module.exports = function (RED) {
         }
         if (this.persistout) {
             this.options.outgoingStore = this.manager.outgoing;
-            this.manager.outgoing.db.persistence.setAutocompactionInterval(this.compactinterval*1000);            
+            this.manager.outgoing.db.persistence.setAutocompactionInterval(this.compactinterval*1000);
         }
 
         // If there's no rejectUnauthorized already, then this could be an
@@ -344,7 +344,7 @@ module.exports = function (RED) {
             } else {
                 deleteStore(removed, done);
             }
-        }); 
+        });
     }
 
     function MQTTInNode(n) {
@@ -402,16 +402,18 @@ module.exports = function (RED) {
         this.subfolder = n.subfolder;
         this.brokerConn = RED.nodes.getNode(this.broker);
 
-        if (this.subfolder) {
-            this.topic = '/devices/' + this.brokerConn.deviceid + '/events/' + this.subfolder;
-        } else {
-            this.topic = '/devices/' + this.brokerConn.deviceid + '/events';
-        }
         var node = this;
 
         if (this.brokerConn) {
             this.status({ fill: "red", shape: "ring", text: "node-red:common.status.disconnected" });
             this.on("input", function (msg) {
+                
+                if (msg.subfolder) {
+                    node.topic = '/devices/' + this.brokerConn.deviceid + '/events/' + msg.subfolder;
+                } else {
+                    node.topic = '/devices/' + this.brokerConn.deviceid + '/events';
+                }
+                console.log(node.topic)
                 if (msg.qos) {
                     msg.qos = parseInt(msg.qos);
                     if ((msg.qos !== 0) && (msg.qos !== 1)) {
