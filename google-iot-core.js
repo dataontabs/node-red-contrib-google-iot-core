@@ -407,13 +407,12 @@ module.exports = function (RED) {
         if (this.brokerConn) {
             this.status({ fill: "red", shape: "ring", text: "node-red:common.status.disconnected" });
             this.on("input", function (msg) {
-                
                 if (msg.subfolder) {
                     node.topic = '/devices/' + this.brokerConn.deviceid + '/events/' + msg.subfolder;
                 } else {
                     node.topic = '/devices/' + this.brokerConn.deviceid + '/events';
                 }
-                console.log(node.topic)
+                
                 if (msg.qos) {
                     msg.qos = parseInt(msg.qos);
                     if ((msg.qos !== 0) && (msg.qos !== 1)) {
@@ -428,6 +427,7 @@ module.exports = function (RED) {
                 }
                 if (msg.hasOwnProperty("payload")) {
                     if (msg.hasOwnProperty("topic") && (typeof msg.topic === "string") && (msg.topic !== "")) { // topic must exist
+                        console.log(msg.topic)
                         this.brokerConn.publish(msg);  // send the message
                     }
                     else { node.warn(RED._("google-iot-core.errors.invalid-topic")); }
